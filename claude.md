@@ -2,11 +2,12 @@
 
 ## What We're Building
 An automated daily quiz system for CLAT (Common Law Admission Test) exam preparation. Every morning at 7:30 AM IST, the system generates an adaptive quiz based on performance analytics, posts it to a website, and sends a WhatsApp notification.
+It will be a single paragraph with 10 questions and time limit of 6 minutes.
 
 ## Key Decisions Made
 
 ### Why This Approach?
-- **Single user** (daughter preparing for CLAT) - no need for complex scaling . Login aditi.patiltt@gmail.com
+- **Single user** (daughter preparing for CLAT) - no need for complex scaling .
 - **Adaptive learning** - quiz difficulty and topics adjust based on her weak areas
 - **Daily habit formation** - consistent 7:30 AM routine
 - **Data-driven improvement** - track performance trends over time
@@ -32,7 +33,7 @@ An automated daily quiz system for CLAT (Common Law Admission Test) exam prepara
 - Git push → auto deploy
 
 **Authentication**: Google OAuth
-- Only daughter has access
+- Only daughter has access. 
 - Simple, secure
 
 **Notifications**: Twilio WhatsApp API
