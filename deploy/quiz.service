@@ -1,0 +1,16 @@
+[Unit]
+Description=CLAT Quiz Flask Application
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/var/www/quiz
+Environment="PATH=/var/www/quiz/venv/bin"
+EnvironmentFile=/var/www/quiz/.env
+ExecStart=/var/www/quiz/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:5001 wsgi:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

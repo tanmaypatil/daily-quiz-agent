@@ -32,3 +32,26 @@ class Config:
     # App settings
     BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')
     QUIZ_TIME_LIMIT_SECONDS = 360  # 6 minutes
+
+    # Quiz generation time (IST, 24-hour format like "07:30" or "07:15")
+    # Note: Update crontab on Lightsail when changing this
+    # Cron runs in UTC, so IST 07:30 = UTC 02:00, IST 07:15 = UTC 01:45
+    QUIZ_GENERATION_TIME_IST = os.environ.get('QUIZ_GENERATION_TIME_IST', '07:30')
+
+    @staticmethod
+    def get_cron_schedule():
+        """Convert IST time to UTC cron schedule string"""
+        time_ist = Config.QUIZ_GENERATION_TIME_IST
+        try:
+            hour, minute = map(int, time_ist.split(':'))
+            # IST is UTC+5:30
+            utc_hour = hour - 5
+            utc_minute = minute - 30
+            if utc_minute < 0:
+                utc_minute += 60
+                utc_hour -= 1
+            if utc_hour < 0:
+                utc_hour += 24
+            return f"{utc_minute} {utc_hour} * * *"
+        except:
+            return "0 2 * * *"  # Default: 7:30 AM IST
