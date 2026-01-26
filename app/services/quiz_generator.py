@@ -67,9 +67,12 @@ CLAT tests:
 1. Create ONE cohesive passage (300-500 words) that can support questions from multiple categories
 2. The passage should be about a legal topic, case, or current affairs related to law or a quuantitative scenario relevant to CLAT
 3. Friday and Sunday quizzes should focus on quantitative techniques and logical reasoning
-4. Generate exactly 10 questions based on the passage
-4. Each question should have 4 options (A, B, C, D)
-5. Provide detailed explanations for each answer
+4. Monday and Wednesday quizzes should focus on legal reasoning and constitutional law
+5. Tuesday and Thursday quizzes should focus on English comprehension and current affairs & legal GK
+6. Saturday quizzes should be balanced across all categories
+7. Generate exactly 10 questions based on the passage
+8. Each question should have 4 options (A, B, C, D)
+9. Provide detailed explanations for each answer
 
 ## Question Distribution
 """
