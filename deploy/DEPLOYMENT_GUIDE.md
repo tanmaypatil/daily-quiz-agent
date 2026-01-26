@@ -93,44 +93,68 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Step 1.6: Create .env File
+### Step 1.6: Create and Configure .env File (CRITICAL)
 
+> **STOP! Do not skip this step.** The app will not work without proper credentials.
+
+**Step 1.6a: Copy the template**
 ```bash
 cp .env.example .env
+```
+
+**Step 1.6b: Generate a secret key**
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
+Copy the output - you'll use it below.
+
+**Step 1.6c: Edit the .env file**
+```bash
 nano .env
 ```
 
-**Edit with your actual values:**
+**Step 1.6d: Update ALL these values with your real credentials:**
+
 ```env
-# Flask
-SECRET_KEY=generate-a-random-string-here
+# Flask - paste the secret key you generated above
+SECRET_KEY=paste-your-generated-secret-key-here
 FLASK_ENV=production
 
-# Database
+# Database - use this exact path
 DATABASE_PATH=/var/db/quiz.db
 
-# Google OAuth (from Google Cloud Console)
-GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-client-secret
+# Google OAuth (from Google Cloud Console → APIs & Services → Credentials)
+GOOGLE_CLIENT_ID=123456789-abcdefg.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-your-actual-secret
 
-# Authorized users
-AUTHORIZED_EMAILS=daughter@gmail.com
+# Authorized users - your daughter's actual email
+AUTHORIZED_EMAILS=actual-email@gmail.com
 
-# Claude API
-ANTHROPIC_API_KEY=sk-ant-your-key
+# Claude API (from console.anthropic.com → API Keys)
+ANTHROPIC_API_KEY=sk-ant-api03-your-actual-key
 
-# Twilio WhatsApp
-TWILIO_ACCOUNT_SID=your-sid
-TWILIO_AUTH_TOKEN=your-token
+# Twilio WhatsApp (from twilio.com → Console → Account Info)
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your-auth-token
 TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
-NOTIFICATION_PHONE=+91xxxxxxxxxx
+NOTIFICATION_PHONE=+919876543210
 
-# Production URL
+# Production URL - use exactly this
 BASE_URL=https://quiz.germanwakad.click
 
-# Quiz generation time
+# Quiz generation time (IST, 24-hour format)
 QUIZ_GENERATION_TIME_IST=07:30
 ```
+
+**Step 1.6e: Save and exit nano**
+- Press `Ctrl+X`, then `Y`, then `Enter`
+
+**Step 1.6f: Verify your .env file**
+```bash
+# Check all required values are set (not placeholder values)
+grep -E "^(SECRET_KEY|GOOGLE_CLIENT_ID|ANTHROPIC_API_KEY|AUTHORIZED_EMAILS)" .env
+```
+Make sure none of them still say "your-" or "paste-".
 
 ### Step 1.7: Initialize Database
 
