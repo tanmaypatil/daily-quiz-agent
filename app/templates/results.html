@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Results - CLAT Quiz{% endblock %}
+
+{% block content %}
+<div class="results-container">
+    <div class="results-header">
+        <h1>Quiz Results</h1>
+        <p class="quiz-date">{{ quiz.quiz_date.strftime('%B %d, %Y') }}</p>
+    </div>
+
+    <div class="score-card">
+        <div class="score-main">
+            <span class="score-value">{{ submission.score }}</span>
+            <span class="score-total">/10</span>
+        </div>
+        <div class="score-percentage">
+            {{ (submission.score / 10 * 100) | int }}%
+        </div>
+        <div class="time-taken">
+            Time: {{ (submission.total_time_seconds // 60) }}:{{ '%02d' | format(submission.total_time_seconds % 60) }}
+        </div>
+    </div>
+
+    <div class="category-breakdown">
+        <h2>Category Breakdown</h2>
+        <div class="category-grid">
+            {% for category, stats in category_stats.items() %}
+            <div class="category-stat">
+                <span class="category-name">{{ category }}</span>
+                <span class="category-score">{{ stats.correct }}/{{ stats.total }}</span>
+                <div class="category-bar">
+                    <div class="category-fill" style="width: {{ (stats.correct / stats.total * 100) if stats.total > 0 else 0 }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="passage-section">
+        <h2>Reading Passage</h2>
+        <div class="passage-text">
+            {{ quiz.passage | safe }}
+        </div>
+    </div>
+
+    <div class="answers-review">
+        <h2>Question Review</h2>
+
+        {% for question in quiz.questions %}
+        {% set answer = answers.get(question.id) %}
+        <div class="review-card {% if answer and answer.is_correct %}correct{% else %}incorrect{% endif %}">
+            <div class="review-header">
+                <span class="question-number">Question {{ question.question_number }}</span>
+                <span class="question-meta">{{ question.category }} | {{ question.difficulty }}</span>
+                {% if answer and answer.is_correct %}
+                <span class="result-badge correct">Correct</span>
+                {% else %}
+                <span class="result-badge incorrect">Incorrect</span>
+                {% endif %}
+            </div>
+
+            <p class="question-text">{{ question.question_text }}</p>
+
+            <div class="options-review">
+                {% for opt, text in [('A', question.option_a), ('B', question.option_b), ('C', question.option_c), ('D', question.option_d)] %}
+                <div class="option-review
+                    {% if opt == question.correct_answer %}correct-answer{% endif %}
+                    {% if answer and answer.selected_answer == opt and not answer.is_correct %}wrong-answer{% endif %}">
+                    <span class="option-label">{{ opt }}</span>
+                    <span class="option-text">{{ text }}</span>
+                    {% if opt == question.correct_answer %}
+                    <span class="checkmark">✓</span>
+                    {% endif %}
+                    {% if answer and answer.selected_answer == opt and not answer.is_correct %}
+                    <span class="crossmark">✗</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="explanation">
+                <strong>Explanation:</strong>
+                <p>{{ question.explanation }}</p>
+            </div>
+
+            {% if answer and answer.time_spent_seconds %}
+            <div class="time-spent">
+                Time spent: {{ answer.time_spent_seconds }}s
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="results-actions">
+        <a href="{{ url_for('quiz.index') }}" class="btn btn-primary">Back to Home</a>
+        <a href="{{ url_for('quiz.history') }}" class="btn btn-secondary">View History</a>
+    </div>
+</div>
+{% endblock %}

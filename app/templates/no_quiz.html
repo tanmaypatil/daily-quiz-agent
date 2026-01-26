@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}No Quiz Available{% endblock %}
+
+{% block content %}
+<div class="no-quiz-container">
+    <div class="no-quiz-card">
+        <h1>No Quiz Available</h1>
+        <p>Today's quiz hasn't been generated yet.</p>
+        <p>Check back at 7:30 AM IST for your daily quiz!</p>
+
+        <a href="{{ url_for('quiz.history') }}" class="btn btn-secondary">View Past Quizzes</a>
+    </div>
+</div>
+{% endblock %}

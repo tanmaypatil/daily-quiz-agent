@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz History{% endblock %}
+
+{% block content %}
+<div class="history-container">
+    <h1>Quiz History</h1>
+
+    {% if submissions %}
+    <div class="history-list">
+        {% for submission in submissions %}
+        <a href="{{ url_for('quiz.results', submission_id=submission.id) }}" class="history-card">
+            <div class="history-date">
+                {{ submission.quiz.quiz_date.strftime('%B %d, %Y') }}
+            </div>
+            <div class="history-score">
+                <span class="score">{{ submission.score }}/10</span>
+                <span class="percentage">({{ (submission.score / 10 * 100) | int }}%)</span>
+            </div>
+            <div class="history-time">
+                {{ (submission.total_time_seconds // 60) }}:{{ '%02d' | format(submission.total_time_seconds % 60) }}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-history">
+        <p>No quizzes completed yet.</p>
+        <a href="{{ url_for('quiz.index') }}" class="btn btn-primary">Take Today's Quiz</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
