@@ -141,14 +141,90 @@ Later we might add:
 
 But start simple and prove value first.
 
+## Current Deployment
+
+**Live URL**: https://quiz.germanwakad.click
+
+**Architecture**:
+```
+User Browser → Nginx (443) → Gunicorn (127.0.0.1:5002) → Flask App
+```
+
+**Server Details**:
+- AWS Lightsail (512MB RAM + 1GB swap)
+- Ubuntu 22.04
+- Port 5002 (port 5001 used by gmail-chat app)
+- SSL via Let's Encrypt (certbot)
+
+**Key Paths**:
+- App: `/var/www/quiz/`
+- Database: `/var/db/quiz.db`
+- Logs: `/var/log/quiz-generator.log`
+- Service: `/etc/systemd/system/quiz.service`
+- Nginx: `/etc/nginx/sites-available/quiz`
+
+**Cron Job** (7:30 AM IST = 2:00 AM UTC):
+```
+0 2 * * * cd /var/www/quiz && /var/www/quiz/venv/bin/python scripts/generate_quiz.py >> /var/log/quiz-cron.log 2>&1
+```
+
 ## Environment Setup
 
-Key configs needed:
-- `ANTHROPIC_API_KEY` - for Claude API
-- `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` - for WhatsApp
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - for OAuth
-- Database path: `/var/db/quiz.db`
-- Quiz HTML served from: `/var/www/quiz/`
+**Required `.env` variables**:
+```env
+# Flask
+SECRET_KEY=<random-secret>
+FLASK_ENV=production
+
+# Database
+DATABASE_PATH=/var/db/quiz.db
+
+# Google OAuth
+GOOGLE_CLIENT_ID=<from Google Cloud Console>
+GOOGLE_CLIENT_SECRET=<from Google Cloud Console>
+
+# Authorized users (comma-separated emails)
+AUTHORIZED_EMAILS=daughter@gmail.com
+
+# Claude API
+ANTHROPIC_API_KEY=sk-ant-<your-key>
+
+# Twilio WhatsApp
+TWILIO_ACCOUNT_SID=AC<your-sid>
+TWILIO_AUTH_TOKEN=<your-token>
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+NOTIFICATION_PHONE=whatsapp:+91<phone-number>
+
+# App URL
+BASE_URL=https://quiz.germanwakad.click
+
+# Quiz generation time (IST)
+QUIZ_GENERATION_TIME_IST=07:30
+```
+
+**Twilio WhatsApp Sandbox**:
+- Users must join sandbox before receiving messages
+- Send `join <code>` to +1 415 523 8886 from WhatsApp
+- Get the code from Twilio Console → Messaging → Try it out → Send a WhatsApp message
+
+## Useful Commands
+
+```bash
+# Restart app
+sudo systemctl restart quiz
+
+# View logs
+sudo journalctl -u quiz -f
+
+# Generate quiz manually
+cd /var/www/quiz && source venv/bin/activate && python scripts/generate_quiz.py
+
+# Test WhatsApp notification
+python -c "from app import create_app; from app.services.notification import NotificationService; app = create_app(); app.app_context().push(); NotificationService().send_quiz_notification()"
+
+# Check cron schedule
+python scripts/show_cron_schedule.py
+```
 
 ## Remember
 
