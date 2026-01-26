@@ -213,7 +213,9 @@ You should see the login page (without HTTPS for now).
 
 ---
 
-## Part 4: SSL/HTTPS Setup
+## Part 4: SSL/HTTPS Setup (Required for Production)
+
+> **Important:** Google OAuth requires HTTPS in production. The app will not work without SSL.
 
 ### Step 4.1: Install Certbot
 
@@ -227,14 +229,34 @@ sudo apt-get install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d quiz.germanwakad.click
 ```
 
-Follow the prompts. Certbot will:
-- Obtain certificate from Let's Encrypt
-- Automatically configure nginx for HTTPS
-- Set up auto-renewal
+**During the process, certbot will ask:**
 
-### Step 4.3: Verify HTTPS
+1. **Enter email address** - For renewal notifications
+2. **Agree to terms** - Type `Y`
+3. **Share email with EFF** - Optional, `N` is fine
+4. **Redirect HTTP to HTTPS** - Choose `2` (Yes, redirect)
+
+**What certbot does automatically:**
+- Obtains SSL certificate from Let's Encrypt
+- Modifies nginx config to handle HTTPS
+- Sets up HTTP → HTTPS redirect
+- Configures auto-renewal (certificates expire every 90 days)
+
+### Step 4.3: Verify SSL Auto-Renewal
+
+```bash
+sudo certbot renew --dry-run
+```
+
+Should show "Congratulations, all renewals succeeded"
+
+### Step 4.4: Test HTTPS Access
 
 Open browser: `https://quiz.germanwakad.click`
+
+You should see:
+- Padlock icon in browser
+- Login page loads correctly
 
 ---
 
