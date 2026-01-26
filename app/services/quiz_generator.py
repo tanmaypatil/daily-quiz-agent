@@ -66,7 +66,8 @@ CLAT tests:
 ## Quiz Requirements
 1. Create ONE cohesive passage (300-500 words) that can support questions from multiple categories
 2. The passage should be about a legal topic, case, or current affairs related to law or a quuantitative scenario relevant to CLAT
-3. Generate exactly 10 questions based on the passage
+3. Friday and Sunday quizzes should focus on quantitative techniques and logical reasoning
+4. Generate exactly 10 questions based on the passage
 4. Each question should have 4 options (A, B, C, D)
 5. Provide detailed explanations for each answer
 
