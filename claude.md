@@ -235,3 +235,16 @@ This is an **adaptive quiz system**, not a general-purpose AI agent. The intelli
 4. Consistent daily delivery
 
 Keep it simple, focused, and effective.
+
+## TODO: WhatsApp Template Migration
+
+**Problem**: Twilio restricts freeform WhatsApp messages in production. Must use pre-approved WhatsApp message templates.
+
+**Current code** (`app/services/notification.py`) sends freeform `body=` messages, which only works in the Twilio sandbox.
+
+**Fix**:
+1. Create templates in **Twilio Console → Content Editor** (e.g., `daily_quiz_ready` with variable `{{1}}` for quiz URL)
+2. Submit for WhatsApp approval
+3. Update `NotificationService` to use `content_sid` + `content_variables` instead of `body` in both `send_quiz_notification()` and `send_results_notification()`
+
+Twilio docs: https://www.twilio.com/docs/content
