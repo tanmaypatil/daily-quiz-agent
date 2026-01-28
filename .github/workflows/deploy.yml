@@ -2,7 +2,7 @@ name: Deploy to Lightsail
 
 on:
   push:
-    branches: [main]
+    branches: [release]
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
             cd /var/www/quiz
-            git pull origin main
+            git pull origin release
             source venv/bin/activate
             pip install -r requirements.txt
             sudo systemctl restart quiz
