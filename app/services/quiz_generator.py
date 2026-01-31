@@ -39,8 +39,12 @@ class QuizGeneratorService:
                 analytics_service = AnalyticsService(user_id)
                 analytics = analytics_service.get_performance_summary()
 
+        # Get recent topics to avoid repetition
+        recent_quizzes = Quiz.query.order_by(Quiz.quiz_date.desc()).limit(7).all()
+        recent_topics = [q.passage[:150] for q in recent_quizzes if q.passage]
+
         # Build and execute prompt
-        prompt = self._build_prompt(analytics)
+        prompt = self._build_prompt(analytics, recent_topics)
         quiz_data = self._call_claude(prompt)
 
         # Create quiz and questions
@@ -48,11 +52,15 @@ class QuizGeneratorService:
 
         return quiz
 
-    def _build_prompt(self, analytics: dict = None) -> str:
+    def _build_prompt(self, analytics: dict = None, recent_topics: list = None) -> str:
         """Build adaptive prompt based on performance analytics"""
+        today = date.today()
+        day_name = today.strftime('%A')
 
         # Base prompt
-        prompt = """You are a CLAT (Common Law Admission Test) exam preparation expert. Generate a quiz with a single reading comprehension passage followed by 10 multiple-choice questions.
+        prompt = f"""You are a CLAT (Common Law Admission Test) exam preparation expert. Generate a quiz with a single reading comprehension passage followed by 10 multiple-choice questions.
+
+## Today's Date: {today.isoformat()} ({day_name})
 
 ## CLAT Exam Context
 CLAT tests:
@@ -65,14 +73,15 @@ CLAT tests:
 
 ## Quiz Requirements
 1. Create ONE cohesive passage (300-500 words) that can support questions from multiple categories
-2. The passage should be about a legal topic, case, or current affairs related to law or a quuantitative scenario relevant to CLAT
-3. Friday and Sunday quizzes should focus on quantitative techniques and logical reasoning
-4. Monday and Wednesday quizzes should focus on legal reasoning and constitutional law
-5. Tuesday and Thursday quizzes should focus on English comprehension and current affairs & legal GK
-6. Saturday quizzes should be balanced across all categories
-7. Generate exactly 10 questions based on the passage
-8. Each question should have 4 options (A, B, C, D)
-9. Provide detailed explanations for each answer
+2. The passage should be about a legal topic, case, or current affairs related to law or a quantitative scenario relevant to CLAT
+3. IMPORTANT: Choose a FRESH topic that hasn't been used recently. Pick from diverse areas like: contract law, criminal law, environmental law, intellectual property, international law, corporate law, family law, property law, tort law, labor law, cyber law, human rights, judicial reforms, legal history, landmark cases from different eras, etc.
+4. Friday and Sunday quizzes should focus on quantitative techniques and logical reasoning
+5. Monday and Wednesday quizzes should focus on legal reasoning and constitutional law
+6. Tuesday and Thursday quizzes should focus on English comprehension and current affairs & legal GK
+7. Saturday quizzes should be balanced across all categories
+8. Generate exactly 10 questions based on the passage
+9. Each question should have 4 options (A, B, C, D)
+10. Provide detailed explanations for each answer
 
 ## Question Distribution
 """
@@ -141,6 +150,16 @@ Return ONLY valid JSON in this exact format:
 }
 ```
 
+"""
+
+        # Add recent topics to avoid
+        if recent_topics:
+            prompt += "\n## Topics to AVOID (used in recent quizzes):\n"
+            for i, topic in enumerate(recent_topics, 1):
+                prompt += f"{i}. {topic}...\n"
+            prompt += "\nChoose a completely different topic from those listed above.\n"
+
+        prompt += """
 Generate the quiz now. Remember:
 - Passage must be engaging and legally relevant
 - Questions should test understanding, not just memory
