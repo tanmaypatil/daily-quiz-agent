@@ -1,7 +1,7 @@
 # CLAT Quiz Agent - Project Context
 
 ## What We're Building
-An automated daily quiz system for CLAT (Common Law Admission Test) exam preparation. Every morning at 7:30 AM IST, the system generates an adaptive quiz based on performance analytics, posts it to a website, and sends a WhatsApp notification.
+An automated daily quiz system for CLAT (Common Law Admission Test) exam preparation. Every morning at 7:30 AM IST, the system generates an adaptive quiz based on performance analytics, posts it to a website, and sends an email notification.
 It will be a single paragraph with 10 questions and time limit of 6 minutes.
 
 ## Key Decisions Made
@@ -36,8 +36,9 @@ It will be a single paragraph with 10 questions and time limit of 6 minutes.
 - Only daughter has access. 
 - Simple, secure
 
-**Notifications**: Twilio WhatsApp API
-- Sends quiz link every morning
+**Notifications**: Gmail SMTP
+- Sends quiz link every morning via email
+- Free, reliable, no sandbox limitations
 
 ### Architecture Philosophy
 
@@ -89,7 +90,7 @@ Claude returns 10 questions as JSON. We render as HTML.
 2. Build adaptive prompt
 3. Call Claude API
 4. Generate HTML quiz page
-5. Send WhatsApp link via Twilio
+5. Send email notification via Gmail SMTP
 
 **User Takes Quiz**
 1. Clicks link, loads quiz page
@@ -189,11 +190,10 @@ AUTHORIZED_EMAILS=daughter@gmail.com
 # Claude API
 ANTHROPIC_API_KEY=sk-ant-<your-key>
 
-# Twilio WhatsApp
-TWILIO_ACCOUNT_SID=AC<your-sid>
-TWILIO_AUTH_TOKEN=<your-token>
-TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
-NOTIFICATION_PHONE=whatsapp:+91<phone-number>
+# Gmail SMTP for notifications
+SMTP_EMAIL=your-email@gmail.com
+SMTP_PASSWORD=xxxx-xxxx-xxxx-xxxx  # Gmail App Password (not regular password)
+NOTIFICATION_EMAIL=daughter@gmail.com
 
 # App URL
 BASE_URL=https://quiz.germanwakad.click
@@ -202,10 +202,11 @@ BASE_URL=https://quiz.germanwakad.click
 QUIZ_GENERATION_TIME_IST=07:30
 ```
 
-**Twilio WhatsApp Sandbox**:
-- Users must join sandbox before receiving messages
-- Send `join <code>` to +1 415 523 8886 from WhatsApp
-- Get the code from Twilio Console → Messaging → Try it out → Send a WhatsApp message
+**Gmail App Password Setup**:
+1. Go to Google Account → Security → 2-Step Verification (enable if not already)
+2. Go to App passwords (at bottom of 2-Step Verification page)
+3. Generate a new app password for "Mail"
+4. Use this 16-character password as SMTP_PASSWORD (not your regular Gmail password)
 
 ## Useful Commands
 
@@ -219,8 +220,8 @@ sudo journalctl -u quiz -f
 # Generate quiz manually
 cd /var/www/quiz && source venv/bin/activate && python scripts/generate_quiz.py
 
-# Test WhatsApp notification
-python -c "from app import create_app; from app.services.notification import NotificationService; app = create_app(); app.app_context().push(); NotificationService().send_quiz_notification()"
+# Test email notification
+python -c "from app import create_app; from app.services.notification import NotificationService; app = create_app(); app.app_context().push(); NotificationService().send_quiz_notification('test@gmail.com', 'https://quiz.germanwakad.click/quiz/2024-01-01')"
 
 # Check cron schedule
 python scripts/show_cron_schedule.py
@@ -235,16 +236,3 @@ This is an **adaptive quiz system**, not a general-purpose AI agent. The intelli
 4. Consistent daily delivery
 
 Keep it simple, focused, and effective.
-
-## TODO: WhatsApp Template Migration
-
-**Problem**: Twilio restricts freeform WhatsApp messages in production. Must use pre-approved WhatsApp message templates.
-
-**Current code** (`app/services/notification.py`) sends freeform `body=` messages, which only works in the Twilio sandbox.
-
-**Fix**:
-1. Create templates in **Twilio Console → Content Editor** (e.g., `daily_quiz_ready` with variable `{{1}}` for quiz URL)
-2. Submit for WhatsApp approval
-3. Update `NotificationService` to use `content_sid` + `content_variables` instead of `body` in both `send_quiz_notification()` and `send_results_notification()`
-
-Twilio docs: https://www.twilio.com/docs/content

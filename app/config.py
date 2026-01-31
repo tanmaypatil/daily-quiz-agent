@@ -24,10 +24,11 @@ class Config:
 
     # External APIs
     ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY')
-    TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
-    TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
-    NOTIFICATION_PHONE = os.environ.get('NOTIFICATION_PHONE')
-    TWILIO_WHATSAPP_FROM = os.environ.get('TWILIO_WHATSAPP_FROM', 'whatsapp:+14155238886')
+
+    # Gmail SMTP for notifications
+    SMTP_EMAIL = os.environ.get('SMTP_EMAIL')
+    SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')
+    NOTIFICATION_EMAIL = os.environ.get('NOTIFICATION_EMAIL')
 
     # App settings
     BASE_URL = os.environ.get('BASE_URL', 'http://localhost:5000')

@@ -69,25 +69,25 @@ def main():
 
             # Send notification if not already sent
             if not quiz.notification_sent:
-                notification_phone = app.config.get('NOTIFICATION_PHONE')
+                notification_email = app.config.get('NOTIFICATION_EMAIL')
                 base_url = app.config.get('BASE_URL')
 
-                if notification_phone and base_url:
+                if notification_email and base_url:
                     try:
                         notifier = NotificationService()
                         quiz_url = f"{base_url}/quiz/{today.isoformat()}"
-                        success = notifier.send_quiz_notification(notification_phone, quiz_url)
+                        success = notifier.send_quiz_notification(notification_email, quiz_url)
 
                         if success:
                             quiz.notification_sent = True
                             db.session.commit()
-                            logger.info("WhatsApp notification sent successfully")
+                            logger.info("Email notification sent successfully")
                         else:
-                            logger.error("Failed to send WhatsApp notification")
+                            logger.error("Failed to send email notification")
                     except Exception as e:
                         logger.error(f"Notification error: {e}")
                 else:
-                    logger.warning("Notification phone or base URL not configured")
+                    logger.warning("Notification email or base URL not configured")
 
             logger.info("Daily quiz generation completed successfully")
 
